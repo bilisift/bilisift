@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>B站动态分组 · 演示</title>
+<!-- 演示页：模拟 B 站顶栏的「动态」弹窗，加载真实的 content.js / content.css，接口与数据均为虚构 -->
+<style>
+  :root {
+    --bg1: #17181a; --bg1_float: #232527; --bg2: #1f2022;
+    --text1: #e3e5e7; --text2: #b4b8be; --text3: #7b8088;
+    --graph_bg_regular: #2f3134; --graph_bg_thin: #2a2c2f; --graph_bg_thick: #3a3d41;
+    --line_regular: #2f3134; --line_light: rgba(255,255,255,.06);
+    --brand_pink: #ff6699; --brand_pink_thin: rgba(255,102,153,.16); --brand_blue: #00aeec;
+  }
+  :root[data-theme="light"] {
+    --bg1: #fff; --bg1_float: #fff; --bg2: #f6f7f8;
+    --text1: #18191c; --text2: #61666d; --text3: #9499a0;
+    --graph_bg_regular: #f1f2f3; --graph_bg_thin: #f6f7f8; --graph_bg_thick: #e3e5e7;
+    --line_regular: #e3e5e7; --line_light: rgba(0,0,0,.06);
+    --brand_pink_thin: #ffecf1;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--bg1);
+    color: var(--text1);
+    font: 14px/1.5 -apple-system, "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", sans-serif;
+    overflow: hidden;
+  }
+  a { color: inherit; text-decoration: none; }
+
+  header {
+    position: relative; z-index: 2;
+    display: flex; align-items: center; height: 64px; padding: 0 24px;
+    background: var(--bg1_float);
+    box-shadow: 0 1px 0 var(--line_regular);
+  }
+  .logo { font-weight: 800; font-size: 20px; letter-spacing: .5px; color: var(--brand_blue); }
+  .search { margin: 0 auto; width: 420px; height: 38px; border-radius: 8px; background: var(--graph_bg_regular); }
+  .entries { display: flex; gap: 18px; align-items: center; }
+  .me { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #e3e5e7, #9499a0); margin-right: 6px; }
+  .entry { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 13px; color: var(--text1); cursor: pointer; }
+  .entry svg { width: 20px; height: 20px; }
+  .v-popover-wrap { position: relative; }
+  .v-popover {
+    display: none;
+    position: absolute; top: 46px; left: 50%; transform: translateX(-50%);
+    padding-top: 10px;
+  }
+  .v-popover-wrap:hover .v-popover, .v-popover-wrap.open .v-popover { display: block; }
+  .dynamic-panel-popover {
+    width: 460px;
+    border-radius: 10px;
+    background: var(--bg1_float);
+    box-shadow: 0 0 30px rgba(0,0,0,.35);
+    border: 1px solid var(--line_regular);
+    overflow: hidden;
+  }
+  .dyn-scroll { max-height: 640px; overflow-y: auto; overscroll-behavior: contain; }
+  .dyn-scroll::-webkit-scrollbar { width: 6px; }
+  .dyn-scroll::-webkit-scrollbar-thumb { background: var(--graph_bg_thick); border-radius: 3px; }
+
+  .ups { display: flex; gap: 22px; padding: 16px 20px 6px; }
+  .ups div { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; color: var(--text2); }
+  .ups img { width: 44px; height: 44px; border-radius: 50%; box-shadow: 0 0 0 2px var(--bg1_float), 0 0 0 3.5px var(--brand_pink); }
+  .divider { display: flex; align-items: center; gap: 12px; padding: 10px 20px; font-size: 13px; color: var(--text3); }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--line_regular); }
+  .n-item { display: flex; gap: 12px; padding: 14px 20px; }
+  .n-item:hover { background: var(--graph_bg_thin); }
+  .n-item > img { width: 40px; height: 40px; border-radius: 50%; flex: none; }
+  .n-main { flex: 1; min-width: 0; }
+  .n-name { font-size: 13px; color: var(--text2); }
+  .n-title { margin-top: 3px; line-height: 20px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .n-time { margin-top: 4px; font-size: 12px; color: var(--text3); }
+  .n-item .n-cover { width: 100px; height: 56px; border-radius: 6px; flex: none; }
+  .all-link { display: block; padding: 12px; text-align: center; font-size: 13px; color: var(--text2); border-top: 1px solid var(--line_regular); }
+
+  main { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 28px 24px; opacity: .55; }
+  .card .thumb { aspect-ratio: 16/9; border-radius: 8px; background: var(--graph_bg_regular); }
+  .card .l1 { height: 12px; width: 90%; margin-top: 12px; border-radius: 4px; background: var(--graph_bg_regular); }
+  .card .l2 { height: 12px; width: 50%; margin-top: 8px; border-radius: 4px; background: var(--graph_bg_thin); }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">bilibili<span style="font-weight:400;color:var(--text3);font-size:13px;margin-left:8px">demo</span></div>
+  <div class="search"></div>
+  <div class="entries">
+    <div class="me"></div>
+    <div class="entry"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 10l4 6 4-6"/></svg>大会员</div>
+    <div class="entry"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 8l9 6 9-6"/></svg>消息</div>
+    <div class="v-popover-wrap" id="dynEntry">
+      <a class="entry" href="//t.bilibili.com/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 12c0-5 2-8 5-8s2 6-5 8zm0 0c5 0 8 2 8 5s-6 2-8-5zm0 0c0 5-2 8-5 8s-2-6 5-8zm0 0c-5 0-8-2-8-5s6-2 8 5z"/></svg><span>动态</span></a>
+      <div class="v-popover">
+        <div class="dynamic-panel-popover">
+          <div class="dyn-scroll" id="native"></div>
+          <a class="all-link" href="#">查看全部动态 ›</a>
+        </div>
+      </div>
+    </div>
+    <div class="entry"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>收藏</div>
+    <div class="entry"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>历史</div>
+    <div class="entry"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/></svg>创作中心</div>
+  </div>
+</header>
+<main id="cards"></main>
+
+<script>
+  const params = new URLSearchParams(location.search);
+  if (params.get('theme') === 'light') document.documentElement.dataset.theme = 'light';
+  if (params.has('open')) document.getElementById('dynEntry').classList.add('open');
+  document.getElementById('cards').innerHTML =
+    '<div class="card"><div class="thumb"></div><div class="l1"></div><div class="l2"></div></div>'.repeat(12);
+</script>
+<script src="mock.js"></script>
+<script>
+  // 原生弹窗内容：最近更新的 UP + 按时间排序的视频动态
+  (() => {
+    const ago = ts => {
+      const s = Date.now() / 1000 - ts;
+      return s < 3600 ? `${Math.max(1, Math.floor(s / 60))}分钟前` : s < 86400 ? `${Math.floor(s / 3600)}小时前` : `${Math.floor(s / 86400)}天前`;
+    };
+    const videos = window.DEMO_FEED.filter(f => f.type === 'DYNAMIC_TYPE_AV').slice(0, 14);
+    const seen = new Set();
+    const ups = videos.map(v => v.modules.module_author).filter(a => !seen.has(a.mid) && seen.add(a.mid)).slice(0, 5);
+    document.getElementById('native').innerHTML =
+      `<div class="ups">${ups.map(a => `<div><img src="${a.face}">${a.name.slice(0, 5)}</div>`).join('')}</div>
+       <div class="divider">历史动态</div>` +
+      videos.map(v => {
+        const a = v.modules.module_author, ar = v.modules.module_dynamic.major.archive;
+        return `<a class="n-item" href="#"><img src="${a.face}"><div class="n-main"><div class="n-name">${a.name}</div><div class="n-title">${ar.title}</div><div class="n-time">${ago(a.pub_ts)}</div></div><img class="n-cover" src="${ar.cover}"></a>`;
+      }).join('');
+  })();
+</script>
+<link rel="stylesheet" href="../content.css">
+<script src="../content.js"></script>
+</body>
+</html>
