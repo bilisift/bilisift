@@ -1,4 +1,4 @@
-# B站动态分组
+<h1><img src="icons/icon.svg" width="44" height="44" align="top" alt=""> B站动态分组</h1>
 
 **项目主页：https://kairui-shi.github.io/bili-dynamic-group/**
 
