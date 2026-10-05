@@ -31,11 +31,11 @@
 .bdg-bar svg { display: block; flex: none; }
 
 /* 第一行：模式标签 + 工具 */
-.bdg-row { display: flex !important; align-items: center; gap: 8px; min-height: 30px !important; height: auto !important; margin: 0 !important; }
+.bdg-row { display: flex !important; align-items: center; gap: 8px; min-height: 28px !important; height: auto !important; margin: 0 !important; }
 .bdg-tabs { display: flex; gap: 14px; }
 .bdg-tab {
   position: relative;
-  padding: 2px 0 8px !important;
+  padding: 2px 0 6px !important;
   font-size: 13px !important;
   line-height: 20px !important;
   color: var(--text2, #61666d);
@@ -101,7 +101,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin: 16px 0 0 !important;
+  margin: 10px 0 0 !important;
   padding: 0 !important;
   max-height: 90px;
   overflow-y: auto;
