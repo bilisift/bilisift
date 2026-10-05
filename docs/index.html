@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>B站动态分组</title>
+<meta name="description" content="在 B 站顶栏的动态弹窗里，按关注分组、视频分区或 UP 主筛选最近几天的动态。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23ff6699'/%3E%3Crect x='7' y='9' width='8' height='5' rx='2.5' fill='%23fff'/%3E%3Crect x='17' y='9' width='8' height='5' rx='2.5' fill='%23fff' opacity='.6'/%3E%3Crect x='7' y='17' width='18' height='3' rx='1.5' fill='%23fff' opacity='.85'/%3E%3Crect x='7' y='22' width='12' height='3' rx='1.5' fill='%23fff' opacity='.6'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #fffaf6;
+    --surface: #ffffff;
+    --ink: #1f1a1c;
+    --ink-2: #5d5458;
+    --ink-3: #9a9094;
+    --line: #f1e6e0;
+    --pink: #ff6699;
+    --pink-soft: #ffe8ef;
+    --orange: #ff9a52;
+    --chip: #f5eeea;
+    --shadow: 0 30px 80px -30px rgba(120, 40, 70, .35), 0 12px 30px -12px rgba(0, 0, 0, .12);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141214;
+      --surface: #1d1a1c;
+      --ink: #f4eef0;
+      --ink-2: #bdb3b7;
+      --ink-3: #847a7e;
+      --line: #2c2729;
+      --pink-soft: rgba(255, 102, 153, .14);
+      --chip: #2a2527;
+      --shadow: 0 30px 80px -30px rgba(0, 0, 0, .8), 0 12px 30px -12px rgba(0, 0, 0, .5);
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.7 -apple-system, BlinkMacSystemFont, "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+  /* 顶部 */
+  nav { display: flex; align-items: center; justify-content: space-between; height: 76px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; }
+  .brand i { width: 28px; height: 28px; border-radius: 8px; background: var(--pink); display: grid; place-items: center; }
+  .gh { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--ink-2); }
+  .gh:hover { color: var(--ink); }
+
+  /* 首屏 */
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr minmax(0, 460px);
+    gap: 72px;
+    align-items: center;
+    padding: 64px 0 120px;
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 4px 12px; border-radius: 999px;
+    background: var(--pink-soft); color: var(--pink);
+    font-size: 13px; font-weight: 600;
+  }
+  h1 {
+    margin: 22px 0 0;
+    font-size: clamp(34px, 4.6vw, 52px);
+    text-wrap: balance;
+    line-height: 1.15;
+    letter-spacing: -.02em;
+    font-weight: 800;
+  }
+  h1 em {
+    font-style: normal;
+    background: linear-gradient(100deg, var(--pink), var(--orange));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .lead { margin: 24px 0 0; max-width: 30em; font-size: 18px; color: var(--ink-2); }
+  .cta { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 40px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    height: 50px; padding: 0 26px; border-radius: 14px;
+    font-size: 16px; font-weight: 600;
+    transition: transform .15s, box-shadow .15s, background-color .15s;
+  }
+  .btn.primary { background: var(--pink); color: #fff; box-shadow: 0 10px 24px -8px rgba(255, 102, 153, .6); }
+  .btn.primary:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -8px rgba(255, 102, 153, .7); }
+  .btn.ghost { background: var(--surface); border: 1px solid var(--line); }
+  .btn.ghost:hover { transform: translateY(-2px); }
+  .meta { margin-top: 18px; font-size: 13px; color: var(--ink-3); }
+
+  .stage { position: relative; }
+  .stage::before {
+    content: ''; position: absolute; inset: 8% -12% -6% 10%;
+    background: radial-gradient(closest-side, rgba(255, 102, 153, .35), transparent),
+                radial-gradient(closest-side at 30% 80%, rgba(255, 154, 82, .3), transparent);
+    filter: blur(30px); z-index: 0;
+  }
+  .stage video {
+    position: relative; z-index: 1;
+    display: block; width: 100%; height: auto;
+    aspect-ratio: 940 / 1140;
+    border-radius: 22px;
+    background: #17181a;
+    box-shadow: var(--shadow);
+  }
+
+  /* 三种分法 */
+  section { padding: 112px 0; border-top: 1px solid var(--line); }
+  .kicker { font-size: 13px; font-weight: 700; letter-spacing: .12em; color: var(--pink); }
+  h2 { margin: 12px 0 0; font-size: clamp(28px, 3.4vw, 40px); line-height: 1.25; letter-spacing: -.01em; }
+  .modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 56px; }
+  .mode {
+    padding: 32px 28px 30px; border-radius: 22px;
+    background: var(--surface); border: 1px solid var(--line);
+  }
+  .mode h3 { margin: 28px 0 6px; font-size: 20px; }
+  .mode p { margin: 0; color: var(--ink-2); font-size: 15px; }
+  .viz { display: flex; flex-wrap: wrap; gap: 8px; min-height: 76px; align-content: flex-start; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    height: 32px; padding: 0 14px; border-radius: 16px;
+    background: var(--chip); font-size: 14px; color: var(--ink-2);
+  }
+  .chip b { font-weight: 500; font-size: 12px; color: var(--ink-3); }
+  .chip.on { background: var(--pink); color: #fff; box-shadow: 0 6px 14px -6px rgba(255, 102, 153, .7); }
+  .chip.on b { color: rgba(255, 255, 255, .8); }
+  .ups { display: flex; gap: 14px; }
+  .up { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-3); }
+  .up i { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-style: normal; font-weight: 700; }
+  .up.on i { box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--pink); }
+  .up.on { color: var(--pink); }
+
+  /* 安装 */
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px; margin-top: 56px; counter-reset: s; }
+  .step::before {
+    counter-increment: s; content: counter(s);
+    display: grid; place-items: center;
+    width: 44px; height: 44px; border-radius: 14px;
+    background: var(--pink-soft); color: var(--pink);
+    font-weight: 800; font-size: 18px;
+  }
+  .step h3 { margin: 20px 0 6px; font-size: 18px; }
+  .step p { margin: 0; color: var(--ink-2); font-size: 15px; }
+  code {
+    padding: 2px 7px; border-radius: 6px;
+    background: var(--chip); font: 13px/1.6 ui-monospace, "Cascadia Code", Consolas, monospace;
+  }
+
+  /* 隐私 */
+  .privacy { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 56px; }
+  .privacy div { display: flex; gap: 14px; align-items: flex-start; }
+  .privacy svg { flex: none; margin-top: 3px; color: var(--pink); }
+  .privacy b { display: block; font-size: 17px; }
+  .privacy span { color: var(--ink-2); font-size: 15px; }
+
+  footer { padding: 48px 0 64px; border-top: 1px solid var(--line); color: var(--ink-3); font-size: 14px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  footer a:hover { color: var(--ink); }
+
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; gap: 56px; padding: 32px 0 88px; }
+    .stage { max-width: 440px; margin: 0 auto; width: 100%; }
+    .stage::before { inset: 8% 0 -6% 0; }
+    .modes, .steps, .privacy { grid-template-columns: 1fr; }
+    .steps { gap: 36px; }
+    section { padding: 80px 0; }
+  }
+  @media (max-width: 480px) {
+    .wrap { padding: 0 16px; }
+    .btn { flex: 1; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <a class="brand" href="./">
+      <i><svg width="16" height="16" viewBox="0 0 16 16" fill="#fff"><rect x="1" y="2" width="6" height="4" rx="2"/><rect x="9" y="2" width="6" height="4" rx="2" opacity=".6"/><rect x="1" y="9" width="14" height="2" rx="1" opacity=".85"/><rect x="1" y="13" width="9" height="2" rx="1" opacity=".6"/></svg></i>
+      B站动态分组
+    </a>
+    <a class="gh" href="https://github.com/Kairui-SHI/bili-dynamic-group">
+      <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      GitHub
+    </a>
+  </nav>
+
+  <header class="hero">
+    <div>
+      <span class="eyebrow">Chrome / Edge 插件 · 免费开源</span>
+      <h1>关注的 UP 太多？<br><em>只看你想看的那一类。</em></h1>
+      <p class="lead">在 B 站顶栏的「动态」弹窗里，按关注分组、视频分区或 UP 主，一键筛出最近几天的更新。</p>
+      <div class="cta">
+        <a class="btn primary" href="https://github.com/Kairui-SHI/bili-dynamic-group/releases/latest">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>
+          下载插件
+        </a>
+        <a class="btn ghost" href="#install">安装方法</a>
+      </div>
+      <div class="meta">v0.1.0 · 约 11 KB · MIT</div>
+    </div>
+    <div class="stage">
+      <video src="assets/demo.mp4" poster="assets/poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="演示：在动态弹窗里切换分组"></video>
+    </div>
+  </header>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">三种分法</div>
+    <h2>不用点进主页，弹窗里就分好了</h2>
+    <div class="modes">
+      <div class="mode">
+        <div class="viz">
+          <span class="chip">特别关注 <b>5</b></span>
+          <span class="chip on">守望先锋 <b>5</b></span>
+          <span class="chip">音乐 <b>5</b></span>
+          <span class="chip">科技 <b>3</b></span>
+        </div>
+        <h3>关注分组</h3>
+        <p>直接用你在 B 站设好的分组。</p>
+      </div>
+      <div class="mode">
+        <div class="viz">
+          <span class="chip on">电子竞技 <b>5</b></span>
+          <span class="chip">音乐综合 <b>5</b></span>
+          <span class="chip">单机游戏 <b>2</b></span>
+          <span class="chip">美食制作 <b>2</b></span>
+        </div>
+        <h3>视频分区</h3>
+        <p>按视频所在分区自动归类，零设置。</p>
+      </div>
+      <div class="mode">
+        <div class="viz ups">
+          <span class="up on"><i style="background:linear-gradient(135deg,#ff8a3d,#ff5e62)">赛</i>3 条</span>
+          <span class="up"><i style="background:linear-gradient(135deg,#8e54e9,#4776e6)">夜</i>3 条</span>
+          <span class="up"><i style="background:linear-gradient(135deg,#614385,#516395)">码</i>2 条</span>
+          <span class="up"><i style="background:linear-gradient(135deg,#f7971e,#ffd200)">食</i>2 条</span>
+        </div>
+        <h3>UP 主</h3>
+        <p>谁最近更新得多，一眼就知道。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="install">
+  <div class="wrap">
+    <div class="kicker">安装</div>
+    <h2>一分钟装好</h2>
+    <div class="steps">
+      <div class="step">
+        <h3>下载并解压</h3>
+        <p>在 <a href="https://github.com/Kairui-SHI/bili-dynamic-group/releases/latest" style="color:var(--pink)">Releases</a> 下载 zip，解压到任意文件夹。</p>
+      </div>
+      <div class="step">
+        <h3>打开开发者模式</h3>
+        <p>进入 <code>chrome://extensions</code> 或 <code>edge://extensions</code>，打开「开发者模式」。</p>
+      </div>
+      <div class="step">
+        <h3>加载插件</h3>
+        <p>点「加载已解压的扩展程序」，选中解压出的文件夹，刷新 B 站即可。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">隐私</div>
+    <h2>只和 B 站说话</h2>
+    <div class="privacy">
+      <div>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+        <p style="margin:0"><b>只请求 B 站接口</b><span>用浏览器里已有的登录状态，和 B 站网页自己的请求一样。</span></p>
+      </div>
+      <div>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+        <p style="margin:0"><b>数据只存本地</b><span>设置和缓存保存在浏览器里，不会离开你的电脑。</span></p>
+      </div>
+      <div>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+        <p style="margin:0"><b>开源可查</b><span>全部代码在 GitHub 上，约 500 行。</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <footer>
+    <span>B站动态分组 · MIT License · 与哔哩哔哩官方无关</span>
+    <a href="https://github.com/Kairui-SHI/bili-dynamic-group/issues">反馈问题</a>
+  </footer>
+</div>
+</body>
+</html>
