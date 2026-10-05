@@ -5,10 +5,10 @@
       <stop offset="1" stop-color="#ff9a52"/>
     </linearGradient>
   </defs>
-  <!-- 16px 简化版：去掉头像圆点，只留标签和两条列表线 -->
-  <rect width="16" height="16" rx="4" fill="url(#bg)"/>
-  <rect x="3" y="3" width="6" height="3" rx="1.5" fill="#fff"/>
-  <rect x="10" y="3" width="3" height="3" rx="1.5" fill="#fff" fill-opacity=".5"/>
-  <rect x="3" y="8" width="10" height="2" rx="1" fill="#fff"/>
-  <rect x="3" y="11.5" width="7" height="2" rx="1" fill="#fff" fill-opacity=".65"/>
+  <!-- 16px 简化版：小电视 + 屏幕里两条线 -->
+  <path d="M5.5 4.5 L3.8 1.6 M10.5 4.5 L12.2 1.6" stroke="#ff6a8f" stroke-width="1.6" stroke-linecap="round"/>
+  <rect x="0.5" y="4" width="15" height="11.5" rx="3.2" fill="url(#bg)"/>
+  <rect x="2.4" y="5.9" width="11.2" height="7.7" rx="1.8" fill="#fff"/>
+  <rect x="4" y="7.4" width="5" height="1.9" rx=".95" fill="#ff5f97"/>
+  <rect x="4" y="10.6" width="8" height="1.6" rx=".8" fill="#ff8a6a" fill-opacity=".7"/>
 </svg>

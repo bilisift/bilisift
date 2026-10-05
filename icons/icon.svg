@@ -5,13 +5,16 @@
       <stop offset="1" stop-color="#ff9a52"/>
     </linearGradient>
   </defs>
-  <rect x="8" y="8" width="112" height="112" rx="30" fill="url(#bg)"/>
-  <!-- 分组标签：一个选中，一个未选中 -->
-  <rect x="26" y="30" width="38" height="20" rx="10" fill="#fff"/>
-  <rect x="70" y="30" width="32" height="20" rx="10" fill="#fff" fill-opacity=".42"/>
-  <!-- 筛选后的动态列表 -->
-  <circle cx="35" cy="71" r="8" fill="#fff"/>
-  <rect x="50" y="66" width="52" height="10" rx="5" fill="#fff"/>
-  <circle cx="35" cy="95" r="8" fill="#fff" fill-opacity=".62"/>
-  <rect x="50" y="90" width="38" height="10" rx="5" fill="#fff" fill-opacity=".62"/>
+  <!-- 小电视：天线 + 机身 -->
+  <path d="M46 32 L32 12 M82 32 L96 12" stroke="#ff6a8f" stroke-width="10" stroke-linecap="round"/>
+  <rect x="8" y="28" width="112" height="90" rx="26" fill="url(#bg)"/>
+  <!-- 屏幕 -->
+  <rect x="21" y="41" width="86" height="64" rx="15" fill="#fff"/>
+  <!-- 屏幕里：分组标签 + 筛选后的列表 -->
+  <rect x="31" y="51" width="30" height="13" rx="6.5" fill="#ff5f97"/>
+  <rect x="66" y="51" width="24" height="13" rx="6.5" fill="#ff5f97" fill-opacity=".25"/>
+  <circle cx="37" cy="77" r="5.5" fill="#ff7a80"/>
+  <rect x="47" y="73.5" width="48" height="7" rx="3.5" fill="#ff7a80"/>
+  <circle cx="37" cy="93" r="5.5" fill="#ff8a6a" fill-opacity=".5"/>
+  <rect x="47" y="89.5" width="34" height="7" rx="3.5" fill="#ff8a6a" fill-opacity=".5"/>
 </svg>
