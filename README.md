@@ -1,6 +1,8 @@
-<h1><img src="icons/icon.svg" width="44" height="44" align="top" alt=""> B站动态分组</h1>
+<h1><img src="icons/icon.svg" width="44" height="44" align="top" alt=""> BiliSift</h1>
 
-**项目主页：https://kairui-shi.github.io/bili-dynamic-group/**
+**B站动态按分组/分区一键筛选**
+
+项目主页：https://kairui-shi.github.io/bilisift/
 
 在 B 站顶栏的「动态」弹窗里加一个筛选栏，按 **关注分组 / 视频分区 / UP主** 只看最近 1～7 天的某一类动态，不用再一个个点进 UP 主页。
 
@@ -12,7 +14,7 @@
 
 ## 安装
 
-1. 在 [Releases](../../releases) 下载最新的 `bili-dynamic-group-vX.Y.Z.zip` 并解压
+1. 在 [Releases](../../releases) 下载最新的 `bilisift-vX.Y.Z.zip` 并解压
 2. 打开 `chrome://extensions`（Edge：`edge://extensions`），开启「开发者模式」
 3. 点击「加载已解压的扩展程序」，选择解压出来的文件夹
 4. 刷新 B 站，把鼠标放到顶栏「动态」上

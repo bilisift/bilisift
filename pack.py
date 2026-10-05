@@ -22,7 +22,7 @@ SENSITIVE = [
 ]
 
 version = json.loads((ROOT / 'manifest.json').read_text('utf-8'))['version']
-out = ROOT / 'dist' / f'bili-dynamic-group-v{version}.zip'
+out = ROOT / 'dist' / f'bilisift-v{version}.zip'
 out.parent.mkdir(exist_ok=True)
 
 problems = []
@@ -50,7 +50,7 @@ if problems:
 
 with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as z:
     for name in FILES + ICONS:
-        info = zipfile.ZipInfo(f'bili-dynamic-group/{name}', date_time=(2026, 1, 1, 0, 0, 0))
+        info = zipfile.ZipInfo(f'bilisift/{name}', date_time=(2026, 1, 1, 0, 0, 0))
         info.external_attr = 0o644 << 16
         info.compress_type = zipfile.ZIP_DEFLATED
         z.writestr(info, (ROOT / name).read_bytes())

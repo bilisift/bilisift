@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "B站动态分组",
+  "name": "BiliSift",
   "version": "0.1.0",
-  "description": "在顶栏「动态」弹窗里，按关注分组 / 视频分区 / UP主 筛选最近几天的动态。",
+  "description": "B站动态按分组/分区一键筛选：在顶栏「动态」弹窗里按关注分组、视频分区或 UP 主只看最近几天的动态。",
   "icons": {
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",
