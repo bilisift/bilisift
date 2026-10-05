@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "B站动态分组",
-  "version": "0.1.1",
+  "version": "0.1.0",
   "description": "在顶栏「动态」弹窗里，按关注分组 / 视频分区 / UP主 筛选最近几天的动态。",
   "icons": {
     "16": "icons/icon-16.png",
