@@ -10,6 +10,9 @@ sys.stderr.reconfigure(encoding='utf-8')
 
 ROOT = Path(__file__).parent
 FILES = ['manifest.json', 'content.js', 'content.css', 'LICENSE']
+ICONS = [f'icons/icon-{s}.png' for s in (16, 32, 48, 128)]
+# PNG 里只允许这些数据块，tEXt / iTXt / eXIf 等可能带作者、软件、路径信息的块一律拒绝
+PNG_OK = {b'IHDR', b'PLTE', b'tRNS', b'IDAT', b'IEND', b'sRGB', b'gAMA', b'pHYs'}
 # 不应出现在发布包里的内容：本机路径、邮箱、用户目录名等
 SENSITIVE = [
     r'(?<![A-Za-z])[A-Za-z]:[\\/]',  # Windows 盘符路径
@@ -33,11 +36,20 @@ for extra in sys.argv[1:]:
     for name in FILES:
         if extra.lower() in (ROOT / name).read_text('utf-8').lower():
             problems.append(f'{name}: contains {extra!r}')
+for name in ICONS:
+    data = (ROOT / name).read_bytes()
+    pos = 8
+    while pos < len(data):
+        size = int.from_bytes(data[pos:pos + 4], 'big')
+        kind = data[pos + 4:pos + 8]
+        if kind not in PNG_OK:
+            problems.append(f'{name}: 含有元数据块 {kind.decode("latin-1")}')
+        pos += 12 + size
 if problems:
     sys.exit('发现疑似个人信息，未打包：\n' + '\n'.join(problems))
 
 with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as z:
-    for name in FILES:
+    for name in FILES + ICONS:
         info = zipfile.ZipInfo(f'bili-dynamic-group/{name}', date_time=(2026, 1, 1, 0, 0, 0))
         info.external_attr = 0o644 << 16
         info.compress_type = zipfile.ZIP_DEFLATED

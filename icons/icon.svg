@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff5f97"/>
+      <stop offset="1" stop-color="#ff9a52"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="112" height="112" rx="30" fill="url(#bg)"/>
+  <!-- 分组标签：一个选中，一个未选中 -->
+  <rect x="26" y="30" width="38" height="20" rx="10" fill="#fff"/>
+  <rect x="70" y="30" width="32" height="20" rx="10" fill="#fff" fill-opacity=".42"/>
+  <!-- 筛选后的动态列表 -->
+  <circle cx="35" cy="71" r="8" fill="#fff"/>
+  <rect x="50" y="66" width="52" height="10" rx="5" fill="#fff"/>
+  <circle cx="35" cy="95" r="8" fill="#fff" fill-opacity=".62"/>
+  <rect x="50" y="90" width="38" height="10" rx="5" fill="#fff" fill-opacity=".62"/>
+</svg>
